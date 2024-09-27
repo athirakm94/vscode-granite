@@ -1,12 +1,11 @@
+<img src="/media/title.png" alt="ollamacontine" width="1000"/>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 In this project,we are building local AI co-pilot using **Granite Code, Ollama, and Continue**,where we utilize a collection of open-source components to implement a feature-rich developer co-pilot in Visual Studio Code, all while ensuring data privacy and compliance with licensing requirements. We are integrating Ollama with Continue to seamlessly work with Visual Studio Code. This integration will assist developers by accelerating the development process, enhancing performance, and improving code quality efficiently.
 
 <p align="center">
-  <img src="/media/continue.png" alt="Continue" style="vertical-align: middle; width: 300px;" />
-  <span style="font-size: 40px; vertical-align: middle;">+</span>
-  <img src="/media/ollama.png" alt="Ollama" style="vertical-align: middle; width: 140px;" />
+  <img src="/media/ollamacontinue.png" alt="Continue" style="vertical-align: middle; width: 800px;" />
 </p>
 
 
@@ -32,9 +31,11 @@ Granite Code comes in a wide range of sizes to fit your workstation's available 
 For more details, refer to [Granite Code Models](https://github.com/ibm-granite/granite-code-models)
 
  ### Workflow of Vscode-Granite
- 
-<img src="/media/workflow.png" alt="workflow" width="350"/>
 
+ <p align="center">
+<img src="/media/workflow.png" alt="workflow" width="400"/>
+ </p>
+ 
 ### Installation Prerequisites:
 
   * OS: MacOS or Linux

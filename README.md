@@ -73,13 +73,13 @@ Open VSCode and navigate to the Debugging tab on the left sidebar. Click on "Run
 
 ![runextension](/media/installandrun.gif)
  
- step 2:  **Install ollama **
+ step 2:  **Install ollama**
 
 Once the extension is running, a new window will prompt you to install Ollama. Simply click the "Install with home brew"(for mac users) button to initiate the installation process.
 
 ![installollama](media/installollama.gif)
 
-step3: **Install granite models** 
+step 3: **Install granite models** 
 
  select the Granite model you wish to install. Follow the on-screen instruction to complete the setup of your models.
 

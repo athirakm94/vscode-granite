@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]  # Define the operating systems for the matrix
+        os: [macos-latest, ubuntu-latest,windows-latest]  # Define the operating systems for the matrix
 
     steps:
       # Checkout code

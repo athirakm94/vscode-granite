@@ -15,7 +15,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: windows-latest
+    runs-on: [macos-latest, ubuntu-latest,windows-latest]
 
     steps:
       # Checkout code
@@ -35,31 +35,36 @@ jobs:
       - name: Run build
         run: npm run package
 
-      # Generate .vsix package for the extension
-      - name: Generate .vsix package
-        run: |
-          npm install -g @vscode/vsce
-          vsce package
+     # Generate .vsix package for the extension
+- name: Generate .vsix package
+  run: |
+    npm install -g @vscode/vsce
+    vsce package
 
-      # Upload VSIX artifact
-      - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vscode-granite-vsix-windows-${{ github.run_id }}  # Unique name with OS and run ID
-          path: "./vscode-granite-*.vsix"
+# Upload VSIX artifact 
+- name: Upload VSIX artifact
+  uses: actions/upload-artifact@v4
+  with:
+    name: vscode-granite-vsix-${{ runner.os }}-${{ github.run_id }}  # Unique name with OS and run ID
+    path: "./vscode-granite-*.vsix"
 
-      # Run tests
-      - name: Run Tests
-        run: npm test
+## Run tests
+- name: Run Tests
+  run: |
+    if [ "${{ runner.os }}" == "Linux" ]; then
+      xvfb-run npm test
+    else
+      npm test
+    fi
 
-      # Update latest release (only for the main branch)
-      - name: Update latest release
-        if: github.ref == 'refs/heads/main'
-        uses: marvinpinto/action-automatic-releases@latest
-        with:
-          repo_token: "${{secrets.GITHUB_TOKEN}}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |
-            *.vsix
+# Update latest release (only on main branch)
+- name: Update latest release
+  if: github.ref == 'refs/heads/main'
+  uses: marvinpinto/action-automatic-releases@latest
+  with:
+    repo_token: "${{ secrets.GITHUB_TOKEN }}"
+    automatic_release_tag: "latest"
+    prerelease: true
+    title: "Development Build"
+    files: |
+      *.vsix

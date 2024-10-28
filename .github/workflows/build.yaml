@@ -1,7 +1,7 @@
 # This is a basic workflow
 name: CI
 
-# Triggers the workflow on all pushes or pull requests on the main branch
+# Triggers the workflow on all pushes or pull requests on any branch
 on:
   push:
     branches: 
@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest] #FIXME windows-latest fails to run tests
+        os: [macos-latest, ubuntu-latest, windows-latest] # Re-added windows-latest
 
     steps:
       # Checkout code
@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: 20
 
-      # Run install dependencies
+      # Run install dependencies (works for all OSes)
       - name: Install dependencies
         run: npm run install:ci
 
@@ -38,16 +38,16 @@ jobs:
       - name: Run build
         run: npm run package
 
-      # Generate .vsix package for the extension 
+      # Generate .vsix package for the extension (only for Linux and Windows)
       - name: Generate .vsix package
-        if: runner.os == 'Linux'  
+        if: runner.os == 'Linux' || runner.os == 'Windows'
         run: |
           npm install -g @vscode/vsce
           vsce package
 
-      # Upload VSIX artifact 
+      # Upload VSIX artifact (only for Linux and Windows)
       - name: Upload VSIX artifact
-        if: runner.os == 'Linux'  
+        if: runner.os == 'Linux' || runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: vscode-granite-vsix-${{ runner.os }}-${{ github.run_id }}  # Unique name with OS and run ID
@@ -58,13 +58,14 @@ jobs:
         run: |
           if [ "${{ runner.os }}" == "Linux" ]; then
             xvfb-run npm test
+          elif [ "${{ runner.os }}" == "Windows" ]; then
+            npm test
           else
             npm test
-          fi
 
       # Update latest release (only on Linux and for main branch)
       - name: Update latest release
-        if: runner.os == 'Linux' && github.ref == 'refs/heads/main'
+        if: (runner.os == 'Linux' || runner.os == 'Windows') && github.ref == 'refs/heads/main'
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"

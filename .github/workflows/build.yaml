@@ -1,7 +1,7 @@
-# This is a basic workflow for Windows only
+# This is a basic workflow for CI across multiple operating systems
 name: CI
 
-# Triggers the workflow on all pushes or pull requests on any branch
+# Triggers the workflow on all pushes or pull requests on the 'test' branch
 on:
   push:
     branches: 
@@ -13,7 +13,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    runs-on: ${{ matrix.os }}  # Correct way to use a matrix for OS
+    runs-on: ${{ matrix.os }}  # This allows the job to run on each OS defined in the matrix
 
     strategy:
       matrix:
@@ -21,6 +21,7 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
+
     steps:
       # Checkout code
       - uses: actions/checkout@v4
@@ -31,9 +32,9 @@ jobs:
         with:
           node-version: 20
 
-      # Run install dependencies
+      # Install dependencies
       - name: Install dependencies
-        run: npm run install:ci
+        run: npm ci  # Use npm ci for a clean install in CI environments
 
       # Build extension
       - name: Run build
@@ -42,20 +43,20 @@ jobs:
       # Generate .vsix package for the extension
       - name: Generate .vsix package
         run: |
-          npm install -g @vscode/vsce
+          npm install -g @vscode/vsce --no-fund --no-optional
           vsce package
 
       # Upload VSIX artifact
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vscode-granite-vsix-windows-${{ github.run_id }}  # Unique name with OS and run ID
+          name: vscode-granite-vsix-${{ runner.os }}-${{ github.run_id }}-${{ github.run_number }}  # Unique name with OS and run ID
           path: "./vscode-granite-*.vsix"
 
-      ## Run tests
+      # Run tests
       - name: Run Tests
         run: |
-          if [ "${{ runner.os }}" == "Linux" ]; then
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
              xvfb-run npm test
           else
              npm test
@@ -66,7 +67,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: "${{secrets.GITHUB_TOKEN}}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build"

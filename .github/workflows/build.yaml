@@ -1,8 +1,7 @@
 # Combined CI workflow for Windows, macOS, and Linux
 name: CI
 
-# Triggers the workflow on all pushes or pull requests on specified branches
-# Triggers the workflow on all pushes or pull requests on any branch
+# Triggers the workflow on all pushes or pull requests on the main branch
 on:
   push:
     branches: 
@@ -41,12 +40,14 @@ jobs:
 
       # Generate .vsix package for the extension 
       - name: Generate .vsix package
+        if: runner.os == 'Linux' 
         run: |
           npm install -g @vscode/vsce
           vsce package
 
       # Upload VSIX artifact
       - name: Upload VSIX artifact
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: vscode-granite-vsix-${{ runner.os }}-${{ github.run_id }}  # Unique name with OS and run ID

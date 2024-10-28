@@ -15,7 +15,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: windows-latest
+    runs-on: [macos-latest, ubuntu-latest, windows-latest] 
 
     steps:
       # Checkout code
@@ -48,9 +48,14 @@ jobs:
           name: vscode-granite-vsix-windows-${{ github.run_id }}  # Unique name with OS and run ID
           path: "./vscode-granite-*.vsix"
 
-      # Run tests
+      ## Run tests
       - name: Run Tests
-        run: npm test
+        run: |
+          if [ "${{ runner.os }}" == "Linux" ]; then
+             xvfb-run npm test
+          else
+             npm test
+          fi
 
       # Update latest release (only for the main branch)
       - name: Update latest release

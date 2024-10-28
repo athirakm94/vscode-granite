@@ -54,6 +54,7 @@ jobs:
 
       ## Run tests
       - name: Run Tests
+        shell: bash
         run: |
           if [[ "${{ runner.os }}" == "Linux" ]]; then
             xvfb-run npm test

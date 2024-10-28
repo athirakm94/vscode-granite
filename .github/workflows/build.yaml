@@ -1,7 +1,8 @@
-# This is a basic workflow for CI across multiple operating systems
+# Combined CI workflow for Windows, macOS, and Linux
 name: CI
 
-# Triggers the workflow on all pushes or pull requests on the 'test' branch
+# Triggers the workflow on all pushes or pull requests on specified branches
+# Triggers the workflow on all pushes or pull requests on any branch
 on:
   push:
     branches: 
@@ -9,18 +10,16 @@ on:
   pull_request:
     branches: 
       - 'test'
+     
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    runs-on: ${{ matrix.os }}  # This allows the job to run on each OS defined in the matrix
-
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: 
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
+        os: [windows-latest, macos-latest, ubuntu-latest]  # Define the operating systems for the matrix
 
     steps:
       # Checkout code
@@ -32,39 +31,39 @@ jobs:
         with:
           node-version: 20
 
-      # Install dependencies
+      # Run install dependencies
       - name: Install dependencies
-        run: npm ci  # Use npm ci for a clean install in CI environments
+        run: npm run install:ci
 
       # Build extension
       - name: Run build
         run: npm run package
 
-      # Generate .vsix package for the extension
+      # Generate .vsix package for the extension 
       - name: Generate .vsix package
         run: |
-          npm install -g @vscode/vsce --no-fund --no-optional
+          npm install -g @vscode/vsce
           vsce package
 
       # Upload VSIX artifact
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vscode-granite-vsix-${{ runner.os }}-${{ github.run_id }}-${{ github.run_number }}  # Unique name with OS and run ID
+          name: vscode-granite-vsix-${{ runner.os }}-${{ github.run_id }}  # Unique name with OS and run ID
           path: "./vscode-granite-*.vsix"
 
-      # Run tests
+      ## Run tests
       - name: Run Tests
         run: |
-          if [[ "${{ runner.os }}" == "Linux" ]]; then
-             xvfb-run npm test
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            xvfb-run npm test
           else
-             npm test
+            npm test
           fi
 
-      # Update latest release (only for the main branch)
+      # Update latest release (only on Linux and for the main branch)
       - name: Update latest release
-        if: github.ref == 'refs/heads/main'
+        if: runner.os == 'Linux' && github.ref == 'refs/heads/main'
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
